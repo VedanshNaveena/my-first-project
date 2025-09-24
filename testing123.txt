@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>shopVOX Contact Form</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <style>
+    body { padding-top: 48px; }
+    .wrapper { padding: 40px 16px; }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="wrapper well">
+          <h1>shopVOX Sample Contact Form</h1>
+
+          <form id="contactForm">
+            <div id="shopvox-contactForm-error-message" class="alert alert-danger"></div>
+
+            <input type="hidden" name="on_success" id="on_success" value="https://www.shopvox.com">
+            <input type="hidden" name="pipeline_name" id="pipeline_name" value="sahithi pipeline">
+            <input type="hidden" name="title" id="title" value="Contact form sales lead">
+            <input type="hidden" name="lead_source_name" id="lead_source" value="Contact Form">
+            <input type="hidden" name="vox_protection" id="vox_protection" value="">
+
+            <div class="form-group">
+              <label for="primary_contact_name">Your Name</label>
+              <input type="text" name="primaryContactName" class="form-control" id="primary_contact_name" placeholder="Name">
+            </div>
+            <div class="form-group">
+              <label for="primaryPhone">Phone</label>
+              <input type="tel" name="phone_number" id="primaryPhone" class="form-control" placeholder="(xxx) xxx-xxxx">
+            </div>
+            <div class="form-group">
+              <label for="company_name">Company Name</label>
+              <input type="text" name="company_name" class="form-control" id="company_name" placeholder="Company Name">
+            </div>
+            <div class="form-group">
+              <label for="email">Your Email address</label>
+              <input type="email" name="email" class="form-control" id="email" placeholder="Email">
+            </div>
+            <div class="form-group">
+              <label for="details">Questions or Comments</label>
+              <textarea class="form-control" name="details" id="details" rows="3" placeholder="Please enter your questions or comments"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="asset">Asset</label>
+              <input type="file" name="asset[]" id="asset" multiple>
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Dependencies -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+  <!-- Corrected AJAX Script -->
+  <script>
+    $(function () {
+      var authToken = "Q7ESBsvkGAb1xt8ViNkdvw";
+      var accountId = "7ed1d0c0-23a5-4947-827f-ec4872351b7f";
+
+      $("#shopvox-contactForm-error-message").hide();
+
+      $("#contactForm").submit(function (e) {
+        e.preventDefault();
+
+        var name = $("#primary_contact_name").val();
+        var company = $("#company_name").val();
+        var phone = $("#primaryPhone").val();
+        var email = $("#email").val();
+
+        if (!name || !company || !phone || !email) {
+          alert("Please fill out all required fields.");
+          return;
+        }
+
+        var robotProtectionValue = $("#vox_protection").val();
+        if (robotProtectionValue !== "") {
+          return;
+        }
+
+        var formData = new FormData(this);
+
+        $.ajax({
+          url: "https://api.shopvox.com/v1/sales_leads.json",
+          type: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          headers: {
+            "Authorization": "Bearer " + authToken,
+            "account_id": accountId
+          },
+          success: function (data) {
+            window.location.href = $("#on_success").val();
+          },
+          error: function (xhr, status, error) {
+            let message = "Submission failed.";
+            if (xhr.responseJSON && xhr.responseJSON.errors) {
+              message += "<br>" + xhr.responseJSON.errors.join("<br>");
+            }
+            $("#shopvox-contactForm-error-message").html(message).show();
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
